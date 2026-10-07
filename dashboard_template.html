@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veille Composants — Dashboard</title>
+<style>
+:root[data-theme="dark"]{
+  --bg:#111110;--bg2:#1a1a19;--bg3:#232322;--border:#2c2c2a;
+  --text:#f0efec;--text2:#a5a39c;--muted:#6f6d66;
+  --rouge:#e24b4a;--orange:#e8963a;--vert:#1baf7a;--bleu:#2a78d6;
+  --violet:#534ab7;--lbc:#eb6834;--gris-part:#4a4a48;
+  --rouge-bg:rgba(226,75,74,.12);--orange-bg:rgba(232,150,58,.12);
+  --vert-bg:rgba(27,175,122,.12);--shadow:rgba(0,0,0,.4);
+}
+:root[data-theme="light"]{
+  --bg:#f7f6f3;--bg2:#ffffff;--bg3:#efeeea;--border:#e1e0d9;
+  --text:#161616;--text2:#5f5d56;--muted:#8f8d86;
+  --rouge:#d43c3b;--orange:#d9862b;--vert:#12946a;--bleu:#2a78d6;
+  --violet:#534ab7;--lbc:#eb6834;--gris-part:#b4b2a9;
+  --rouge-bg:rgba(212,60,59,.09);--orange-bg:rgba(217,134,43,.10);
+  --vert-bg:rgba(18,148,106,.10);--shadow:rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;line-height:1.5;padding:0 0 60px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 18px}
+header{position:sticky;top:0;z-index:50;background:var(--bg);
+  border-bottom:1px solid var(--border);padding:10px 0;margin-bottom:14px}
+.hrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+h1{font-size:17px;font-weight:600}
+.maj{font-size:12px;color:var(--muted)}
+.demo-badge{display:none;font-size:11px;background:var(--orange-bg);
+  color:var(--orange);border:1px solid var(--orange);border-radius:5px;
+  padding:2px 8px;font-weight:600}
+.spacer{flex:1}
+#themeBtn{background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px}
+#themeBtn:hover{border-color:var(--muted)}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px}
+nav button{background:none;border:none;color:var(--text2);padding:7px 13px;
+  cursor:pointer;font-size:13.5px;border-radius:7px;font-weight:500}
+nav button:hover{background:var(--bg3);color:var(--text)}
+nav button.on{background:var(--bg3);color:var(--text);font-weight:600}
+.tab{display:none}.tab.on{display:block}
+h2{font-size:16px;font-weight:600;margin:20px 0 4px}
+h3{font-size:14px;font-weight:600;margin:16px 0 4px}
+.sub{font-size:12.5px;color:var(--text2);margin-bottom:10px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:16px;margin-bottom:14px;box-shadow:0 1px 4px var(--shadow)}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+select,input[type=text],input[type=number],input[type=date]{
+  background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:7px 10px;font-size:13px;outline:none}
+select:focus,input:focus{border-color:var(--bleu)}
+.seg{display:inline-flex;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden}
+.seg button{background:none;border:none;color:var(--text2);padding:6px 13px;
+  cursor:pointer;font-size:12.5px}
+.seg button.on{background:var(--bleu);color:#fff}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  padding:9px 15px;min-width:105px}
+.stat .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.stat .val{font-size:17px;font-weight:600;margin-top:1px}
+.stat .val.sm{font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-weight:500;font-size:11.5px;
+  text-transform:uppercase;letter-spacing:.4px;padding:7px 9px;
+  border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 9px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.r-rouge{background:var(--rouge-bg)}tr.r-orange{background:var(--orange-bg)}
+tr.r-vert{background:var(--vert-bg)}
+.pill{display:inline-block;padding:1px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+.p-rouge{background:var(--rouge);color:#fff}.p-orange{background:var(--orange);color:#fff}
+.p-vert{background:var(--vert);color:#fff}.p-gris{background:var(--gris-part);color:var(--text)}
+.tag-lot{display:inline-block;background:var(--violet);color:#fff;font-size:10px;
+  font-weight:700;border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:1px}
+.prix{font-weight:600;white-space:nowrap}
+.pct-neg{color:var(--vert);font-weight:600}.pct-pos{color:var(--rouge)}
+.marge-pos{color:var(--vert);font-weight:600}.marge-neg{color:var(--rouge)}
+a.lien{color:var(--bleu);text-decoration:none;font-size:12.5px}
+a.lien:hover{text-decoration:underline}
+.etoiles{color:var(--orange);font-size:12px;letter-spacing:1px}
+.plateforme{font-size:12px;color:var(--text2)}
+canvas.chart{width:100%;display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+.donut-flex{display:flex;gap:1.6rem;align-items:center;justify-content:center;flex-wrap:wrap}
+.dleg{font-size:12.5px}
+.dleg div{display:flex;align-items:center;gap:7px;margin:5px 0}
+.dleg .sq{width:11px;height:11px;border-radius:3px;flex:none}
+.dleg b{margin-left:auto;padding-left:14px}
+.leg{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:12px;color:var(--text2)}
+.leg span{display:flex;align-items:center;gap:5px}
+.leg .ln{width:16px;height:0;border-top:2.5px solid;display:inline-block;border-radius:2px}
+.leg .ln.dash{border-top-style:dashed}
+.empty{color:var(--muted);font-size:13px;padding:20px;text-align:center}
+.note{font-size:11.5px;color:var(--muted);margin-top:8px}
+.resume-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.rcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px}
+.rcard h4{font-size:14px;margin-bottom:8px}
+.rrow{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0;color:var(--text2)}
+.rrow b{color:var(--text)}
+.btn{background:var(--bleu);color:#fff;border:none;border-radius:8px;
+  padding:7px 14px;cursor:pointer;font-size:13px;font-weight:500}
+.btn:hover{opacity:.9}
+.btn.ghost{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn.danger{background:var(--rouge)}
+.opp-gain{color:var(--vert);font-weight:700}
+.small-note{font-size:11px;color:var(--muted)}
+.pnl-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+.pnl-form label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--text2)}
+.scroll-x{overflow-x:auto}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="hrow">
+    <h1>Veille Composants</h1>
+    <span class="maj" id="majTxt"></span>
+    <span class="demo-badge" id="demoBadge">DONNÉES DE DÉMONSTRATION</span>
+    <span class="spacer"></span>
+    <button id="themeBtn" title="Changer le thème">🌙 Sombre</button>
+  </div>
+  <nav id="tabs">
+    <button data-tab="tableaux" class="on">Tableaux</button>
+    <button data-tab="tendances">Tendances</button>
+    <button data-tab="deals">Deals</button>
+    <button data-tab="marche">Valeur marché</button>
+    <button data-tab="pc">Vente PC</button>
+    <button data-tab="opportunites">Opportunités</button>
+    <button data-tab="resume">Résumé</button>
+    <button data-tab="pnl">P&amp;L</button>
+  </nav>
+</div></header>
+<div class="wrap">
+
+<!-- ============ TABLEAUX ============ -->
+<div class="tab on" id="tab-tableaux">
+  <div class="controls">
+    <select id="selComposant"></select>
+    <div class="seg" id="segVue">
+      <button data-v="occasion" class="on">Occasion</button>
+      <button data-v="neuf">Neuf</button>
+      <button data-v="mixte">Mixte</button>
+    </div>
+    <div class="seg" id="segAlerte">
+      <button data-a="toutes" class="on">Toutes</button>
+      <button data-a="rouge">🔴 Rouge</button>
+      <button data-a="orange">🟠 Orange</button>
+      <button data-a="vert">🟢 Vert</button>
+    </div>
+  </div>
+  <div class="stats" id="statsTableaux"></div>
+  <div class="card scroll-x"><table id="tblAnnonces"></table></div>
+  <p class="note">Trié du moins cher au plus cher. Les annonces à plus de +15% de la médiane sont masquées.
+  Prix unitaire affiché pour les lots. Région et livraison disponibles pour Leboncoin.</p>
+</div>
+
+<!-- ============ TENDANCES ============ -->
+<div class="tab" id="tab-tendances">
+  <div class="controls"><select id="selTendance"></select></div>
+  <div class="grid2">
+    <div class="card"><h3>Bougies — Occasion</h3><p class="sub">Évolution quotidienne du prix médian occasion (ouverture/clôture/haut/bas)</p>
+      <canvas class="chart" id="cdlOcc" height="240"></canvas></div>
+    <div class="card"><h3>Bougies — Neuf</h3><p class="sub">Évolution quotidienne du prix neuf le plus bas</p>
+      <canvas class="chart" id="cdlNeuf" height="240"></canvas></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Médiane par plateforme — Occasion</h3><p class="sub">Une courbe par plateforme occasion</p>
+      <canvas class="chart" id="lignesOcc" height="230"></canvas><div class="leg" id="legOcc"></div></div>
+    <div class="card"><h3>Prix mini par source — Neuf</h3><p class="sub">Le prix neuf le plus bas par source</p>
+      <canvas class="chart" id="lignesNeuf" height="230"></canvas><div class="leg" id="legNeuf"></div></div>
+  </div>
+</div>
+
+<!-- ============ DEALS ============ -->
+<div class="tab" id="tab-deals">
+  <h2>Journal des deals</h2>
+  <p class="sub">Toutes les annonces passées en alerte rouge ou orange, horodatées. C'est ton historique de bonnes affaires.</p>
+  <div class="stats" id="statsDeals"></div>
+  <div class="card scroll-x"><table id="tblDeals"></table></div>
+</div>
+
+<!-- ============ VALEUR MARCHÉ ============ -->
+<div class="tab" id="tab-marche">
+  <div class="controls"><select id="selMarche"></select></div>
+  <div class="grid2">
+    <div class="card"><h3>Répartition de la valeur marché — Occasion</h3>
+      <p class="sub">Somme des prix de toutes les annonces visibles, par plateforme</p>
+      <div class="donut-flex"><canvas id="donutMarche" width="230" height="230"></canvas>
+      <div class="dleg" id="legMarche"></div></div></div>
+    <div class="card"><h3>Évolution de la taille du marché</h3>
+      <p class="sub">Valeur totale des annonces par plateforme, jour par jour</p>
+      <canvas class="chart" id="evoMarche" height="240"></canvas><div class="leg" id="legEvoMarche"></div></div>
+  </div>
+  <div class="card scroll-x"><h3>Détail par modèle</h3><table id="tblMarche"></table></div>
+</div>
+
+<!-- ============ VENTE PC ============ -->
+<div class="tab" id="tab-pc">
+  <h2>Marché des PC gamer montés</h2>
+  <p class="sub">PC avec GPU qualifiant (RTX ≥ 3060 ou RX ≥ 5700 XT hors 6400/6500) ET CPU qualifiant (Ryzen/Intel de ta liste). Vinted + Leboncoin.</p>
+
+  <div class="grid3">
+    <div class="card"><div class="donut-flex" style="flex-direction:column;gap:8px">
+      <div class="sub" style="margin:0">Part GPU dans les PC en vente</div>
+      <canvas id="donutGpu" width="180" height="180"></canvas><div class="dleg" id="legGpu"></div></div></div>
+    <div class="card"><div class="donut-flex" style="flex-direction:column;gap:8px">
+      <div class="sub" style="margin:0">Offres PC par plateforme</div>
+      <canvas id="donutOffres" width="180" height="180"></canvas><div class="dleg" id="legOffres"></div></div></div>
+    <div class="card"><div class="donut-flex" style="flex-direction:column;gap:8px">
+      <div class="sub" style="margin:0">Vendeurs en Île-de-France (Leboncoin)</div>
+      <canvas id="donutIdf" width="180" height="180"></canvas><div class="dleg" id="legIdf"></div></div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>Ventes réelles par plateforme (par jour)</h3>
+      <p class="sub">Annonces disparues entre deux scans (3h), reset à minuit. Fiable après 48-72h de collecte.</p>
+      <canvas class="chart" id="ventesPlateforme" height="220"></canvas>
+      <div class="leg"><span><span class="ln" style="border-color:var(--bleu)"></span>Vinted</span>
+      <span><span class="ln" style="border-color:var(--lbc)"></span>Leboncoin</span></div></div>
+    <div class="card"><h3>Ventes NVIDIA vs AMD (par jour)</h3>
+      <p class="sub">Quel marché GPU accélère dans les PC vendus</p>
+      <canvas class="chart" id="ventesGpu" height="220"></canvas>
+      <div class="leg"><span><span class="ln" style="border-color:var(--vert)"></span>NVIDIA</span>
+      <span><span class="ln" style="border-color:var(--rouge)"></span>AMD</span></div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>Ventes estimées "vendu" seul</h3>
+      <p class="sub">Disparues en moins de 21 jours = vente probable. Filtre les retraits d'annonces anciennes.</p>
+      <canvas class="chart" id="ventesEstimees" height="210"></canvas>
+      <div class="leg"><span><span class="ln" style="border-color:var(--violet)"></span>Vendu estimé</span>
+      <span><span class="ln dash" style="border-color:var(--muted)"></span>Toutes disparitions</span></div></div>
+    <div class="card"><h3>Rentabilité du montage</h3>
+      <p class="sub">Prix médian des PC en vente vs coût médian de montage (composants occasion). L'écart = ta marge brute potentielle.</p>
+      <canvas class="chart" id="rentabilite" height="210"></canvas>
+      <div class="leg"><span><span class="ln" style="border-color:var(--bleu)"></span>Prix médian PC</span>
+      <span><span class="ln" style="border-color:var(--orange)"></span>Coût montage</span></div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3 style="display:flex;align-items:center;gap:10px">Bougies des PC vendus
+      <span class="seg" id="segBougiesPc"><button data-p="jour" class="on">Jour</button><button data-p="semaine">Semaine</button></span></h3>
+      <p class="sub">Prix des PC disparus (vendus) : ouverture, clôture, min, max par période</p>
+      <canvas class="chart" id="cdlVentes" height="230"></canvas></div>
+    <div class="card"><h3>Prix brut vs valeur nette</h3>
+      <p class="sub">Médiane des prix affichés vs médiane de la valeur nette (composants au prix occasion). La zone entre les deux = marge du marché.</p>
+      <canvas class="chart" id="brutNet" height="230"></canvas>
+      <div class="leg"><span><span class="ln" style="border-color:var(--bleu)"></span>Prix affiché (brut)</span>
+      <span><span class="ln dash" style="border-color:var(--vert)"></span>Valeur nette composants</span></div></div>
+  </div>
+
+  <div class="card scroll-x"><h3>Annonces PC en vente</h3>
+    <div class="controls">
+      <div class="seg" id="segPcPlat"><button data-f="toutes" class="on">Toutes</button>
+      <button data-f="Vinted">Vinted</button><button data-f="Leboncoin">Leboncoin</button></div>
+    </div>
+    <table id="tblPc"></table>
+    <p class="note">Net = valeur des composants détectés au prix médian occasion + défauts (RAM 16Go, SSD 512Go, alim médiane, +50€ boîtier, +50€ CM si absents).
+    Écart négatif = le PC est vendu SOUS la valeur de ses pièces.</p></div>
+</div>
+
+<!-- ============ OPPORTUNITÉS ============ -->
+<div class="tab" id="tab-opportunites">
+  <h2>Opportunités</h2>
+  <p class="sub">Détection automatique : PC vendus sous la valeur de leurs composants, configs qui tournent vite, marges par gamme.</p>
+  <div class="card scroll-x"><h3>🎯 PC sous-évalués (prix &lt; valeur des pièces)</h3>
+    <p class="sub">Achète, revends en pièces ou tel quel : le gain est la différence.</p>
+    <table id="tblOpp"></table></div>
+  <div class="grid2">
+    <div class="card"><h3>Temps de vente moyen par GPU</h3>
+      <p class="sub">Combien de jours un PC reste en ligne avant de disparaître. Court = forte demande.</p>
+      <canvas class="chart" id="tempsVente" height="220"></canvas></div>
+    <div class="card"><h3>Marge par gamme de prix</h3>
+      <p class="sub">Écart médian prix affiché - valeur nette, par tranche de prix. Où est la marge ?</p>
+      <canvas class="chart" id="margeGamme" height="220"></canvas></div>
+  </div>
+  <div class="card" id="configGagnante"></div>
+</div>
+
+<!-- ============ RÉSUMÉ ============ -->
+<div class="tab" id="tab-resume">
+  <h2>Résumé du marché</h2>
+  <p class="sub">Vue d'ensemble par modèle : occasion vs neuf, rotation, meilleure affaire du moment.</p>
+  <div class="resume-grid" id="resumeGrid"></div>
+</div>
+
+<!-- ============ P&L ============ -->
+<div class="tab" id="tab-pnl">
+  <h2>P&amp;L — Achats &amp; Reventes</h2>
+  <p class="sub">Saisis tes vrais achats et reventes. Sauvegardé dans le navigateur (localStorage) — utilise Exporter pour un backup JSON.</p>
+  <div class="stats" id="statsPnl"></div>
+  <div class="card">
+    <div class="pnl-form">
+      <label>Date<input type="date" id="pnlDate"></label>
+      <label>Description<input type="text" id="pnlDesc" placeholder="RTX 3060 Vinted" style="width:210px"></label>
+      <label>Type<select id="pnlType"><option value="achat">Achat</option><option value="vente">Vente</option><option value="frais">Frais</option></select></label>
+      <label>Montant €<input type="number" id="pnlMontant" step="0.01" style="width:110px"></label>
+      <button class="btn" id="pnlAdd">Ajouter</button>
+      <span class="spacer"></span>
+      <button class="btn ghost" id="pnlExport">Exporter JSON</button>
+      <button class="btn ghost" id="pnlImportBtn">Importer</button>
+      <input type="file" id="pnlImport" accept=".json" style="display:none">
+    </div>
+    <div class="scroll-x"><table id="tblPnl"></table></div>
+  </div>
+</div>
+
+</div>
+<script>
+window.DATA = /*__DATA__*/null/*__FIN_DATA__*/;
+</script>
+<script>
+/* ================================================================
+   CORE : thème, onglets, helpers
+================================================================ */
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt=n=>n==null?"—":Number(n).toLocaleString("fr-FR",{maximumFractionDigits:0});
+const fmtE=n=>n==null?"—":fmt(n)+" €";
+const fmt1=n=>n==null?"—":Number(n).toLocaleString("fr-FR",{maximumFractionDigits:1});
+
+/* ---- thème ---- */
+const themeBtn=$("#themeBtn");
+function setTheme(t){
+  document.documentElement.dataset.theme=t;
+  try{localStorage.setItem("vc_theme",t)}catch(e){}
+  themeBtn.textContent=t==="dark"?"🌙 Sombre":"☀️ Clair";
+  renderAll();
+}
+themeBtn.onclick=()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
+
+/* ---- onglets ---- */
+$$("#tabs button").forEach(b=>b.onclick=()=>{
+  $$("#tabs button").forEach(x=>x.classList.remove("on"));
+  $$(".tab").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");
+  $("#tab-"+b.dataset.tab).classList.add("on");
+  renderAll();
+});
+
+/* ---- segments génériques ---- */
+function segInit(id,cb){
+  $$("#"+id+" button").forEach(b=>b.onclick=()=>{
+    $$("#"+id+" button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");cb();
+  });
+}
+function segVal(id,attr){const b=$("#"+id+" button.on");return b?b.dataset[attr]:null}
+
+/* ---- stats ---- */
+function mediane(a){if(!a.length)return null;const s=[...a].sort((x,y)=>x-y),m=s.length>>1;
+  return s.length%2?s[m]:(s[m-1]+s[m])/2}
+function moyenne(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:null}
+
+/* ================================================================
+   CANVAS : setup HiDPI + courbes + bougies + donuts
+================================================================ */
+function setupCanvas(cv){
+  const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  const h=cv.getAttribute("height")||240;
+  cv.width=r.width*dpr;cv.height=h*dpr;cv.style.height=h+"px";
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  return[c,r.width,+h];
+}
+function axes(c,W,H,pad,min,max,fmtFn){
+  c.strokeStyle=css("--border");c.fillStyle=css("--muted");
+  c.font="10.5px sans-serif";c.textAlign="right";c.lineWidth=1;
+  const n=4;
+  for(let i=0;i<=n;i++){
+    const v=min+(max-min)*i/n, y=H-pad.b-(H-pad.t-pad.b)*i/n;
+    c.beginPath();c.moveTo(pad.l,y);c.lineTo(W-pad.r,y);c.stroke();
+    c.fillText((fmtFn||fmt)(v),pad.l-6,y+3);
+  }
+}
+function drawLines(cv,labels,series,opts={}){
+  const[c,W,H]=setupCanvas(cv);
+  const pad={l:46,r:10,t:12,b:26};
+  const all=series.flatMap(s=>s.data).filter(v=>v!=null);
+  if(!all.length){c.fillStyle=css("--muted");c.font="12px sans-serif";c.textAlign="center";
+    c.fillText("Pas encore de données — laisse tourner le script",W/2,H/2);return}
+  let min=Math.min(...all),max=Math.max(...all);
+  if(min===max){min-=1;max+=1}
+  const marge=(max-min)*.12;min=Math.max(0,min-marge);max+=marge;
+  axes(c,W,H,pad,min,max,opts.fmt);
+  const X=i=>pad.l+(W-pad.l-pad.r)*(labels.length===1?.5:i/(labels.length-1));
+  const Y=v=>H-pad.b-(H-pad.t-pad.b)*(v-min)/(max-min);
+  c.textAlign="center";c.fillStyle=css("--muted");c.font="10px sans-serif";
+  const step=Math.ceil(labels.length/9);
+  labels.forEach((l,i)=>{if(i%step===0)c.fillText(l,X(i),H-8)});
+  series.forEach(s=>{
+    c.strokeStyle=s.color;c.lineWidth=2.2;
+    if(s.dash)c.setLineDash([6,4]);else c.setLineDash([]);
+    c.beginPath();let started=false;
+    s.data.forEach((v,i)=>{if(v==null){started=false;return}
+      started?c.lineTo(X(i),Y(v)):c.moveTo(X(i),Y(v));started=true});
+    c.stroke();c.setLineDash([]);
+    if(s.fillTo!=null){
+      c.globalAlpha=.10;c.fillStyle=s.color;c.beginPath();
+      s.data.forEach((v,i)=>i===0?c.moveTo(X(i),Y(v??min)):c.lineTo(X(i),Y(v??min)));
+      for(let i=s.data.length-1;i>=0;i--)c.lineTo(X(i),Y(s.fillTo[i]??min));
+      c.closePath();c.fill();c.globalAlpha=1;
+    }
+    c.fillStyle=s.color;
+    s.data.forEach((v,i)=>{if(v==null)return;c.beginPath();c.arc(X(i),Y(v),2.6,0,7);c.fill()});
+  });
+}
+function drawCandles(cv,bougies){
+  const[c,W,H]=setupCanvas(cv);
+  if(!bougies.length){c.fillStyle=css("--muted");c.font="12px sans-serif";c.textAlign="center";
+    c.fillText("Pas encore de données — laisse tourner le script",W/2,H/2);return}
+  const pad={l:46,r:10,t:12,b:26};
+  let min=Math.min(...bougies.map(b=>b.l)),max=Math.max(...bougies.map(b=>b.h));
+  const marge=(max-min)*.12||1;min-=marge;max+=marge;
+  axes(c,W,H,pad,min,max);
+  const n=bougies.length;
+  const X=i=>pad.l+(W-pad.l-pad.r)*(i+.5)/n;
+  const Y=v=>H-pad.b-(H-pad.t-pad.b)*(v-min)/(max-min);
+  const bw=Math.min(22,(W-pad.l-pad.r)/n*.55);
+  c.textAlign="center";c.font="10px sans-serif";
+  const step=Math.ceil(n/9);
+  bougies.forEach((b,i)=>{
+    const up=b.c>=b.o,col=up?css("--vert"):css("--rouge");
+    c.strokeStyle=col;c.fillStyle=col;c.lineWidth=1.6;
+    c.beginPath();c.moveTo(X(i),Y(b.h));c.lineTo(X(i),Y(b.l));c.stroke();
+    const yO=Y(b.o),yC=Y(b.c),top=Math.min(yO,yC),hh=Math.max(3,Math.abs(yO-yC));
+    c.beginPath();c.roundRect(X(i)-bw/2,top,bw,hh,3);c.fill();
+    if(i%step===0){c.fillStyle=css("--muted");c.fillText(b.date,X(i),H-8)}
+  });
+}
+function drawDonut(cv,legEl,parts,centre1,centre2){
+  const[c]=setupCanvas.call?[cv.getContext("2d")]:[cv.getContext("2d")];
+  const S=+cv.getAttribute("width"),cx=S/2,cy=S/2,r=S/2-6,ri=r*.6;
+  const dpr=window.devicePixelRatio||1;
+  cv.width=S*dpr;cv.height=S*dpr;cv.style.width=S+"px";cv.style.height=S+"px";
+  const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const total=parts.reduce((s,p)=>s+p.v,0);
+  if(!total){ctx.fillStyle=css("--muted");ctx.font="11px sans-serif";ctx.textAlign="center";
+    ctx.fillText("Pas de données",cx,cy);legEl.innerHTML="";return}
+  let a=-Math.PI/2;
+  parts.forEach(p=>{
+    const s=p.v/total*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*ri,cy+Math.sin(a)*ri);
+    ctx.arc(cx,cy,r,a,a+s);ctx.arc(cx,cy,ri,a+s,a,true);ctx.closePath();
+    ctx.fillStyle=p.color;ctx.fill();a+=s;
+  });
+  ctx.fillStyle=css("--bg2");ctx.beginPath();ctx.arc(cx,cy,ri-1,0,7);ctx.fill();
+  ctx.fillStyle=css("--text");ctx.font="600 15px sans-serif";
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillText(centre1,cx,cy-7);
+  ctx.fillStyle=css("--muted");ctx.font="10.5px sans-serif";ctx.fillText(centre2,cx,cy+11);
+  legEl.innerHTML=parts.map(p=>`<div><span class="sq" style="background:${p.color}"></span>
+    ${p.label}<b>${Math.round(p.v/total*100)}%</b></div>`).join("");
+}
+function drawBars(cv,labels,values,color,fmtFn){
+  const[c,W,H]=setupCanvas(cv);
+  if(!values.length||values.every(v=>v==null)){c.fillStyle=css("--muted");c.font="12px sans-serif";
+    c.textAlign="center";c.fillText("Pas encore de données",W/2,H/2);return}
+  const pad={l:46,r:10,t:14,b:44};
+  const vals=values.filter(v=>v!=null);
+  let min=Math.min(0,...vals),max=Math.max(...vals,1);
+  const marge=(max-min)*.12;max+=marge;if(min<0)min-=marge;
+  axes(c,W,H,pad,min,max,fmtFn);
+  const n=labels.length,bw=Math.min(56,(W-pad.l-pad.r)/n*.6);
+  const X=i=>pad.l+(W-pad.l-pad.r)*(i+.5)/n;
+  const Y=v=>H-pad.b-(H-pad.t-pad.b)*(v-min)/(max-min);
+  labels.forEach((l,i)=>{
+    const v=values[i];
+    if(v!=null){
+      c.fillStyle=typeof color==="function"?color(v,i):color;
+      const y0=Y(Math.max(0,min)),y1=Y(v);
+      c.beginPath();c.roundRect(X(i)-bw/2,Math.min(y0,y1),bw,Math.max(3,Math.abs(y0-y1)),4);c.fill();
+      c.fillStyle=css("--text");c.font="600 10.5px sans-serif";c.textAlign="center";
+      c.fillText((fmtFn||fmt)(v),X(i),Math.min(y0,y1)-5);
+    }
+    c.fillStyle=css("--muted");c.font="10px sans-serif";c.textAlign="center";
+    const mots=String(l).split(" ");
+    mots.slice(0,2).forEach((m,k)=>c.fillText(m,X(i),H-26+k*11));
+  });
+}
+</script>
+<script>
+/* ================================================================
+   DONNÉES : réelles (injectées par dashboard_export.py) ou démo
+================================================================ */
+function genDemo(){
+  const jours=[...Array(14)].map((_,i)=>{const d=new Date(Date.now()-(13-i)*864e5);
+    return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}`});
+  const rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
+  const mkAnn=(modele,base,plats,n)=>[...Array(n)].map((_,i)=>({
+    id:"demo"+modele+i,titre:`${modele} ${["Gaming","OC","Ventus","Dual","Eagle"][i%5]} — très bon état`,
+    prix:rnd(base*.62,base*1.14),modele,plateforme:plats[i%plats.length],
+    url:"#",etat:"Très bon état",score_vendeur:(3.5+Math.random()*1.5).toFixed(1),
+    lot_type:i%9===0?"lot_gros":"normal",lot_quantite:i%9===0?2:1,
+    region:["Ile-de-France","Bretagne","Occitanie","Auvergne-Rhône-Alpes"][i%4],
+    livraison:["Livraison","Main propre","?"][i%3]}));
+  const occ=[...mkAnn("RTX 3060",200,["Vinted","Leboncoin","Mon7up"],14),
+             ...mkAnn("RTX 3070",320,["Vinted","Leboncoin","PCC Reconditionné"],11),
+             ...mkAnn("Ryzen 5 5600",95,["Vinted","Leboncoin","Mon7up"],9),
+             ...mkAnn("DDR4 16Go",34,["Vinted","Leboncoin"],7),
+             ...mkAnn("SSD SATA 512Go",30,["Vinted","Mon7up"],6),
+             ...mkAnn("650W",42,["Vinted","Leboncoin"],5),
+             ...mkAnn("B550",68,["Leboncoin","Mon7up"],5)];
+  const neuf=[...mkAnn("RTX 3060",295,["ldlc.com","amazon.fr","cybertek.fr","pccomponentes.fr","Idealo (min marché)"],9),
+              ...mkAnn("RTX 3070",450,["grosbill.com","materiel.net","topbiz.fr","Idealo (min marché)"],7),
+              ...mkAnn("Ryzen 5 5600",135,["ldlc.com","amazon.fr","Idealo (min marché)"],6)];
+  neuf.forEach(a=>{a.etat="Neuf";a.region="";a.livraison="Livraison"});
+  const hist={},histPlat={},evoMarche={};
+  ["RTX 3060","RTX 3070","Ryzen 5 5600"].forEach(m=>{
+    const base=m==="RTX 3070"?320:m==="RTX 3060"?200:95;let p=base;
+    hist[m]={occasion:jours.map(d=>{const o=p;p+=rnd(-9,9);
+      return{date:d,o,c:p,h:Math.max(o,p)+rnd(2,9),l:Math.min(o,p)-rnd(2,9)}}),
+      neuf:jours.map((d,i)=>{const o=base*1.45+rnd(-6,6);
+      return{date:d,o,c:o+rnd(-5,5),h:o+rnd(4,10),l:o-rnd(4,10)}})};
+    histPlat[m]={occasion:{Vinted:jours.map(()=>base+rnd(-14,14)),
+      Leboncoin:jours.map(()=>base+rnd(-18,10)),Mon7up:jours.map(()=>base+rnd(-8,18))},
+      neuf:{"GPUTracker (min)":jours.map(()=>base*1.42+rnd(-8,8)),
+      "Idealo (min marché)":jours.map(()=>base*1.46+rnd(-8,8))}};
+    evoMarche[m]=jours.map((d,i)=>({date:d,Vinted:rnd(2200,3400),Leboncoin:rnd(3000,5200),
+      Mon7up:rnd(700,1400),"PCC Reconditionné":rnd(400,900)}));
+  });
+  const deals=[...Array(16)].map((_,i)=>({date:jours[rnd(0,13)]+" "+rnd(8,22)+":"+String(rnd(0,59)).padStart(2,"0"),
+    modele:["RTX 3060","RTX 3070","Ryzen 5 5600"][i%3],titre:"Annonce démo bonne affaire",
+    prix:[139,215,58][i%3]+rnd(-10,10),pct:-(rnd(16,42)),marge:rnd(18,90),
+    plateforme:["Vinted","Leboncoin","Mon7up"][i%3],alerte:i%3===0?"rouge":"orange",url:"#"}));
+  const pcAnn=[...Array(26)].map((_,i)=>{
+    const nv=i%3!==0,gm=nv?["RTX 3060","RTX 3060 TI","RTX 3070","RTX 4060"][i%4]:["RX 6600","RX 6700 XT","RX 7600"][i%3];
+    const cm=["Ryzen 5 5600","Core i5-12400F","Ryzen 7 5700X"][i%3];
+    const net=nv?rnd(540,760):rnd(500,700),prix=net+rnd(-90,220);
+    return{id:"pcdemo"+i,titre:`PC Gamer ${gm} ${cm} 16Go RGB`,prix,
+      gpu_marque:nv?"nvidia":"amd",gpu_modele:gm,cpu_modele:cm,
+      plateforme:i%5<3?"Leboncoin":"Vinted",net,ecart:prix-net,
+      region:["Ile-de-France","Bretagne","Occitanie","Hauts-de-France"][i%4],
+      livraison:["Livraison","Main propre","?"][i%3],url:"#",
+      premiere_vue:new Date(Date.now()-rnd(0,20)*864e5).toISOString()}});
+  const ventesJour=jours.map(d=>{const v=rnd(8,19),l=rnd(6,14);
+    return{date:d,vinted:v,leboncoin:l,nvidia:Math.round((v+l)*.6),
+    amd:Math.round((v+l)*.4),vendu_estime:Math.round((v+l)*.82),total:v+l}});
+  const bougiesJ=jours.map((d,i)=>{const o=680+rnd(-30,30);
+    return{date:d,o,c:o+rnd(-35,35),h:o+rnd(15,55),l:o-rnd(15,55)}});
+  return{
+    genere_le:new Date().toISOString(),demo:true,
+    seuils:{rouge:-30,orange:-15,masquage:15},frais:12,
+    composants:{occasion:occ,neuf:neuf},
+    historique_prix:hist,historique_plateformes:histPlat,evolution_marche:evoMarche,
+    deals_log:deals,
+    rotation:{"RTX 3060":52,"RTX 3070":66,"Ryzen 5 5600":38},
+    pc:{annonces:pcAnn,ventes_jour:ventesJour,
+      bougies_ventes_jour:bougiesJ,
+      bougies_ventes_semaine:[{date:"S31",o:660,c:695,h:740,l:640},{date:"S32",o:695,c:672,h:735,l:650},{date:"S33",o:672,c:710,h:752,l:660},{date:"S34",o:710,c:698,h:745,l:672}],
+      brut_net:jours.map((d,i)=>({date:d,brut:690+rnd(-25,25),net:585+rnd(-20,20)}))}
+  };
+}
+const D=window.DATA||genDemo();
+if(D.demo)$("#demoBadge").style.display="inline-block";
+$("#majTxt").textContent="Mis à jour : "+new Date(D.genere_le).toLocaleString("fr-FR");
+
+/* ================================================================
+   PRÉPARATION : groupes, médianes, enrichissement
+================================================================ */
+const GROUPES={"Tous les GPU":m=>/^(RTX|GTX|RX)\b/i.test(m),
+  "Tous les CPU":m=>/^(Ryzen|Core)/i.test(m),
+  "Toute la RAM":m=>/^DDR/i.test(m),
+  "Tout le stockage":m=>/^(SSD|HDD)/i.test(m),
+  "Toutes les alims":m=>/^\d{3,4}W$/i.test(m),
+  "Toutes les CM":m=>/^[ABHXZ]\d{3}$/i.test(m)};
+function modelesDispo(){
+  const s=new Set();
+  D.composants.occasion.concat(D.composants.neuf).forEach(a=>{if(a.modele)s.add(a.modele)});
+  return[...s].sort();
+}
+function enrichir(list){
+  const parM={};list.forEach(a=>{(parM[a.modele||"?"]=parM[a.modele||"?"]||[]).push(a.lot_quantite>1?a.prix/a.lot_quantite:a.prix)});
+  const med={};Object.entries(parM).forEach(([m,px])=>med[m]=mediane(px));
+  return list.map(a=>{
+    const pu=a.lot_quantite>1?a.prix/a.lot_quantite:a.prix;
+    const m=med[a.modele||"?"];
+    const pct=m?Math.round((pu-m)/m*1000)/10:null;
+    let alerte="gris";
+    if(pct!=null){if(pct>D.seuils.masquage)alerte="masque";
+      else if(pct<=D.seuils.rouge)alerte="rouge";
+      else if(pct<=D.seuils.orange)alerte="orange";
+      else if(pct<=0)alerte="vert"}
+    return{...a,prix_unitaire:pu,mediane:m,pct,alerte,
+      marge:m!=null?Math.round((m-pu-D.frais)*10)/10:null};
+  });
+}
+const OCC=enrichir(D.composants.occasion), NEUF=enrichir(D.composants.neuf);
+function filtreModele(list,sel){
+  if(sel==="__tous")return list;
+  if(GROUPES[sel])return list.filter(a=>a.modele&&GROUPES[sel](a.modele));
+  return list.filter(a=>a.modele===sel);
+}
+function remplirSelect(el){
+  const modeles=modelesDispo();
+  el.innerHTML=`<option value="__tous">Tous les composants</option>`+
+    Object.keys(GROUPES).map(g=>`<option>${g}</option>`).join("")+
+    `<option disabled>──────────</option>`+
+    modeles.map(m=>`<option>${m}</option>`).join("");
+}
+["selComposant","selTendance","selMarche"].forEach(id=>remplirSelect($("#"+id)));
+$("#selTendance").value=modelesDispo()[0]||"__tous";
+$("#selMarche").value="__tous";
+</script>
+<script>
+/* ================================================================
+   ONGLET TABLEAUX
+================================================================ */
+function etoiles(s){if(s==null)return"";const n=Math.round(s);
+  return`<span class="etoiles" title="${s}/5">${"★".repeat(n)}${"☆".repeat(5-n)}</span>`}
+function pilule(a){const t={rouge:"🔴 Achète",orange:"🟠 Regarde",vert:"🟢 Correct",gris:"⚪ Au-dessus"};
+  return`<span class="pill p-${a}">${t[a]||a}</span>`}
+function renderTableaux(){
+  const sel=$("#selComposant").value,vue=segVal("segVue","v"),fa=segVal("segAlerte","a");
+  let list=vue==="occasion"?filtreModele(OCC,sel):vue==="neuf"?filtreModele(NEUF,sel)
+    :filtreModele(OCC,sel).concat(filtreModele(NEUF,sel));
+  list=list.filter(a=>a.alerte!=="masque");
+  if(fa!=="toutes")list=list.filter(a=>a.alerte===fa);
+  list.sort((a,b)=>a.prix_unitaire-b.prix_unitaire);
+  const px=list.map(a=>a.prix_unitaire);
+  $("#statsTableaux").innerHTML=`
+    <div class="stat"><div class="lab">Annonces</div><div class="val">${list.length}</div></div>
+    <div class="stat"><div class="lab">Médiane</div><div class="val">${fmtE(mediane(px))}</div></div>
+    <div class="stat"><div class="lab">Min</div><div class="val">${fmtE(px[0])}</div></div>
+    <div class="stat"><div class="lab">Max</div><div class="val">${fmtE(px[px.length-1])}</div></div>
+    <div class="stat"><div class="lab">Valeur totale</div><div class="val sm">${fmtE(px.reduce((a,b)=>a+b,0))}</div></div>`;
+  const aLbc=list.some(a=>a.plateforme==="Leboncoin");
+  $("#tblAnnonces").innerHTML=`<tr><th>Alerte</th><th>Modèle</th><th>Annonce</th>
+    <th>Prix</th><th>vs médiane</th><th>Marge est.</th><th>Vendeur</th><th>Plateforme</th>
+    ${aLbc?"<th>Région</th><th>Livraison</th>":""}<th></th></tr>`+
+    (list.length?list.map(a=>`<tr class="r-${a.alerte}">
+      <td>${pilule(a.alerte)}</td>
+      <td><b>${a.modele||"?"}</b>${a.lot_type==="lot_gros"?`<span class="tag-lot">LOT ×${a.lot_quantite}</span>`:""}</td>
+      <td style="max-width:290px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.titre}">${a.titre}</td>
+      <td class="prix">${fmtE(a.prix_unitaire)}${a.lot_quantite>1?`<div class="small-note">${fmtE(a.prix)} le lot</div>`:""}</td>
+      <td class="${a.pct<=0?"pct-neg":"pct-pos"}">${a.pct==null?"—":(a.pct>0?"+":"")+fmt1(a.pct)+"%"}</td>
+      <td class="${a.marge>0?"marge-pos":"marge-neg"}">${a.marge==null?"—":(a.marge>0?"+":"")+fmt1(a.marge)+" €"}</td>
+      <td>${etoiles(a.score_vendeur)}</td>
+      <td class="plateforme">${a.plateforme}</td>
+      ${aLbc?`<td class="plateforme">${a.region||"—"}</td><td class="plateforme">${a.livraison||"—"}</td>`:""}
+      <td><a class="lien" href="${a.url}" target="_blank">Voir ↗</a></td></tr>`).join("")
+    :`<tr><td colspan="12" class="empty">Aucune annonce pour ce filtre</td></tr>`);
+}
+segInit("segVue",renderTableaux);segInit("segAlerte",renderTableaux);
+$("#selComposant").onchange=renderTableaux;
+
+/* ================================================================
+   ONGLET TENDANCES
+================================================================ */
+const PALETTE=["#2a78d6","#eb6834","#1baf7a","#e24b4a","#534ab7","#e8963a","#18a0a8","#b3599c"];
+function renderTendances(){
+  const m=$("#selTendance").value;
+  const h=D.historique_prix[m]||{occasion:[],neuf:[]};
+  drawCandles($("#cdlOcc"),h.occasion||[]);
+  drawCandles($("#cdlNeuf"),h.neuf||[]);
+  const hp=D.historique_plateformes[m]||{occasion:{},neuf:{}};
+  const dates=(h.occasion||[]).map(b=>b.date);
+  const mkSeries=(obj)=>Object.entries(obj).map(([nom,data],i)=>({
+    nom,data,color:PALETTE[i%PALETTE.length]}));
+  const sOcc=mkSeries(hp.occasion||{}),sNeuf=mkSeries(hp.neuf||{});
+  drawLines($("#lignesOcc"),dates,sOcc);
+  drawLines($("#lignesNeuf"),dates,sNeuf);
+  $("#legOcc").innerHTML=sOcc.map(s=>`<span><span class="ln" style="border-color:${s.color}"></span>${s.nom}</span>`).join("");
+  $("#legNeuf").innerHTML=sNeuf.map(s=>`<span><span class="ln" style="border-color:${s.color}"></span>${s.nom}</span>`).join("");
+}
+$("#selTendance").onchange=renderTendances;
+
+/* ================================================================
+   ONGLET DEALS
+================================================================ */
+function renderDeals(){
+  const deals=[...(D.deals_log||[])].reverse();
+  const rouges=deals.filter(d=>d.alerte==="rouge").length;
+  $("#statsDeals").innerHTML=`
+    <div class="stat"><div class="lab">Deals (30j)</div><div class="val">${deals.length}</div></div>
+    <div class="stat"><div class="lab">🔴 Rouges</div><div class="val">${rouges}</div></div>
+    <div class="stat"><div class="lab">Fréquence rouge</div><div class="val sm">${rouges?fmt1(30/rouges)+" j":"—"}</div></div>`;
+  $("#tblDeals").innerHTML=`<tr><th>Quand</th><th>Alerte</th><th>Modèle</th><th>Annonce</th>
+    <th>Prix</th><th>vs médiane</th><th>Marge est.</th><th>Plateforme</th><th></th></tr>`+
+    (deals.length?deals.map(d=>`<tr class="r-${d.alerte}">
+      <td class="plateforme">${d.date}</td><td>${pilule(d.alerte)}</td>
+      <td><b>${d.modele}</b></td>
+      <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.titre}</td>
+      <td class="prix">${fmtE(d.prix)}</td>
+      <td class="pct-neg">${fmt1(d.pct)}%</td>
+      <td class="marge-pos">+${fmt1(d.marge)} €</td>
+      <td class="plateforme">${d.plateforme}</td>
+      <td><a class="lien" href="${d.url}" target="_blank">Voir ↗</a></td></tr>`).join("")
+    :`<tr><td colspan="9" class="empty">Aucun deal enregistré pour l'instant</td></tr>`);
+}
+
+/* ================================================================
+   ONGLET VALEUR MARCHÉ
+================================================================ */
+function renderMarche(){
+  const sel=$("#selMarche").value;
+  const list=filtreModele(OCC,sel).filter(a=>a.alerte!=="masque");
+  const parPlat={};list.forEach(a=>parPlat[a.plateforme]=(parPlat[a.plateforme]||0)+a.prix_unitaire);
+  const parts=Object.entries(parPlat).map(([label,v],i)=>({label,v,color:PALETTE[i%PALETTE.length]}));
+  const total=parts.reduce((s,p)=>s+p.v,0);
+  drawDonut($("#donutMarche"),$("#legMarche"),parts,fmt(total)+" €","au total");
+  const evo={};
+  Object.entries(D.evolution_marche||{}).forEach(([m,pts])=>{
+    if(sel!=="__tous"&&!(GROUPES[sel]?GROUPES[sel](m):m===sel))return;
+    pts.forEach(p=>{const e=evo[p.date]=evo[p.date]||{};
+      Object.entries(p).forEach(([k,v])=>{if(k!=="date")e[k]=(e[k]||0)+v})})});
+  const dates=Object.keys(evo);
+  const plats=[...new Set(dates.flatMap(d=>Object.keys(evo[d])))];
+  const series=plats.map((p,i)=>({nom:p,color:PALETTE[i%PALETTE.length],
+    data:dates.map(d=>evo[d][p]??null)}));
+  drawLines($("#evoMarche"),dates,series,{fmt:v=>fmt(v/1000)+"k"});
+  $("#legEvoMarche").innerHTML=series.map(s=>`<span><span class="ln" style="border-color:${s.color}"></span>${s.nom}</span>`).join("");
+  const parModele={};list.forEach(a=>{const e=parModele[a.modele]=parModele[a.modele]||{n:0,sous:0,tot:0,med:a.mediane};
+    e.n++;e.tot+=a.prix_unitaire;if(a.mediane&&a.prix_unitaire<=a.mediane)e.sous+=a.prix_unitaire});
+  $("#tblMarche").innerHTML=`<tr><th>Modèle</th><th>Annonces</th><th>Médiane</th>
+    <th>Valeur sous médiane</th><th>Valeur totale visible</th></tr>`+
+    Object.entries(parModele).sort((a,b)=>b[1].tot-a[1].tot).map(([m,e])=>`<tr>
+      <td><b>${m}</b></td><td>${e.n}</td><td>${fmtE(e.med)}</td>
+      <td>${fmtE(e.sous)}</td><td class="prix">${fmtE(e.tot)}</td></tr>`).join("");
+}
+$("#selMarche").onchange=renderMarche;
+</script>
+<script>
+/* ================================================================
+   ONGLET VENTE PC
+================================================================ */
+function renderPc(){
+  const pc=D.pc||{annonces:[],ventes_jour:[]};
+  const ann=pc.annonces||[];
+  /* donut part GPU */
+  const nv=ann.filter(a=>a.gpu_marque==="nvidia").length,
+        am=ann.filter(a=>a.gpu_marque==="amd").length;
+  drawDonut($("#donutGpu"),$("#legGpu"),
+    [{label:"NVIDIA",v:nv,color:css("--vert")},{label:"AMD",v:am,color:css("--rouge")}],
+    "GPU","en vente");
+  /* donut offres par plateforme */
+  const parP={};ann.forEach(a=>parP[a.plateforme]=(parP[a.plateforme]||0)+1);
+  drawDonut($("#donutOffres"),$("#legOffres"),
+    [{label:"Vinted",v:parP["Vinted"]||0,color:css("--bleu")},
+     {label:"Leboncoin",v:parP["Leboncoin"]||0,color:css("--lbc")}],
+    String(ann.length),"offres");
+  /* donut IDF (Leboncoin seul, Vinted ne donne pas la région) */
+  const lbc=ann.filter(a=>a.plateforme==="Leboncoin"&&a.region);
+  const idf=lbc.filter(a=>/ile.de.france/i.test(a.region)).length;
+  drawDonut($("#donutIdf"),$("#legIdf"),
+    [{label:"Île-de-France",v:idf,color:css("--violet")},
+     {label:"Reste France",v:lbc.length-idf,color:css("--gris-part")}],
+    lbc.length?Math.round(idf/lbc.length*100)+"%":"—","en IDF");
+  /* courbes ventes */
+  const vj=pc.ventes_jour||[];
+  const dates=vj.map(v=>v.date);
+  drawLines($("#ventesPlateforme"),dates,[
+    {nom:"Vinted",color:css("--bleu"),data:vj.map(v=>v.vinted)},
+    {nom:"Leboncoin",color:css("--lbc"),data:vj.map(v=>v.leboncoin)}]);
+  drawLines($("#ventesGpu"),dates,[
+    {nom:"NVIDIA",color:css("--vert"),data:vj.map(v=>v.nvidia)},
+    {nom:"AMD",color:css("--rouge"),data:vj.map(v=>v.amd)}]);
+  drawLines($("#ventesEstimees"),dates,[
+    {nom:"Vendu estimé",color:css("--violet"),data:vj.map(v=>v.vendu_estime)},
+    {nom:"Total",color:css("--muted"),dash:true,data:vj.map(v=>(v.vinted||0)+(v.leboncoin||0))}]);
+  /* rentabilité : médiane des prix affichés vs médiane des nets */
+  const bn=pc.brut_net||[];
+  drawLines($("#rentabilite"),bn.map(b=>b.date),[
+    {nom:"Prix PC",color:css("--bleu"),data:bn.map(b=>b.brut),fillTo:bn.map(b=>b.net)},
+    {nom:"Coût montage",color:css("--orange"),data:bn.map(b=>b.net)}]);
+  /* bougies ventes */
+  const per=segVal("segBougiesPc","p");
+  drawCandles($("#cdlVentes"),per==="semaine"?(pc.bougies_ventes_semaine||[]):(pc.bougies_ventes_jour||[]));
+  /* brut vs net */
+  drawLines($("#brutNet"),bn.map(b=>b.date),[
+    {nom:"Brut",color:css("--bleu"),data:bn.map(b=>b.brut)},
+    {nom:"Net",color:css("--vert"),dash:true,data:bn.map(b=>b.net)}]);
+  /* tableau annonces PC */
+  const f=segVal("segPcPlat","f");
+  let liste=[...ann];
+  if(f!=="toutes")liste=liste.filter(a=>a.plateforme===f);
+  liste.sort((a,b)=>(a.ecart??1e9)-(b.ecart??1e9));
+  $("#tblPc").innerHTML=`<tr><th>Annonce</th><th>GPU</th><th>CPU</th><th>Prix</th>
+    <th>Net (pièces)</th><th>Écart</th><th>Plateforme</th><th>Région</th><th>Livraison</th><th></th></tr>`+
+    (liste.length?liste.map(a=>{
+      const e=a.ecart, cls=e==null?"":e<0?"marge-pos":e>150?"marge-neg":"";
+      return`<tr class="${e!=null&&e<0?"r-vert":""}">
+      <td style="max-width:270px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.titre}">${a.titre}</td>
+      <td><b>${a.gpu_modele||"?"}</b></td><td>${a.cpu_modele||"?"}</td>
+      <td class="prix">${fmtE(a.prix)}</td><td>${fmtE(a.net)}</td>
+      <td class="${cls}">${e==null?"—":(e>0?"+":"")+fmt(e)+" €"}</td>
+      <td class="plateforme">${a.plateforme}</td>
+      <td class="plateforme">${a.region||"—"}</td><td class="plateforme">${a.livraison||"—"}</td>
+      <td><a class="lien" href="${a.url}" target="_blank">Voir ↗</a></td></tr>`}).join("")
+    :`<tr><td colspan="10" class="empty">Aucune annonce PC qualifiée pour l'instant</td></tr>`);
+}
+segInit("segBougiesPc",renderPc);segInit("segPcPlat",renderPc);
+
+/* ================================================================
+   ONGLET OPPORTUNITÉS
+================================================================ */
+function joursEnLigne(a){try{return (Date.now()-new Date(a.premiere_vue))/864e5}catch(e){return null}}
+function renderOpportunites(){
+  const ann=(D.pc&&D.pc.annonces)||[];
+  const opp=ann.filter(a=>a.ecart!=null&&a.ecart<0).sort((a,b)=>a.ecart-b.ecart);
+  $("#tblOpp").innerHTML=`<tr><th>Annonce</th><th>GPU</th><th>Prix</th><th>Valeur pièces</th>
+    <th>Gain potentiel</th><th>Plateforme</th><th>Livraison</th><th></th></tr>`+
+    (opp.length?opp.map(a=>`<tr class="r-vert">
+      <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.titre}</td>
+      <td><b>${a.gpu_modele}</b></td><td class="prix">${fmtE(a.prix)}</td><td>${fmtE(a.net)}</td>
+      <td class="opp-gain">+${fmt(-a.ecart)} €</td>
+      <td class="plateforme">${a.plateforme}</td><td class="plateforme">${a.livraison||"—"}</td>
+      <td><a class="lien" href="${a.url}" target="_blank">Voir ↗</a></td></tr>`).join("")
+    :`<tr><td colspan="8" class="empty">Aucun PC sous-évalué en ce moment — c'est rare, reviens plus tard</td></tr>`);
+  /* temps de vente moyen par GPU (annonces encore en ligne : âge moyen) */
+  const parGpu={};
+  ann.forEach(a=>{const j=joursEnLigne(a);if(j==null||!a.gpu_modele)return;
+    (parGpu[a.gpu_modele]=parGpu[a.gpu_modele]||[]).push(j)});
+  const gLabels=Object.keys(parGpu).sort();
+  drawBars($("#tempsVente"),gLabels,gLabels.map(g=>Math.round(moyenne(parGpu[g])*10)/10),
+    v=>v<7?css("--vert"):v<14?css("--orange"):css("--rouge"),v=>fmt1(v)+" j");
+  /* marge par gamme de prix */
+  const gammes=[[0,500,"< 500€"],[500,700,"500-700€"],[700,900,"700-900€"],[900,1e9,"> 900€"]];
+  const mLabels=gammes.map(g=>g[2]);
+  const mVals=gammes.map(([lo,hi])=>{
+    const es=ann.filter(a=>a.prix>=lo&&a.prix<hi&&a.ecart!=null).map(a=>a.ecart);
+    return es.length?Math.round(mediane(es)):null});
+  drawBars($("#margeGamme"),mLabels,mVals,
+    v=>v<0?css("--vert"):css("--orange"),v=>(v>0?"+":"")+fmt(v)+" €");
+  /* config gagnante */
+  const vitesse=Object.entries(parGpu).map(([g,js])=>({g,age:moyenne(js)}))
+    .sort((a,b)=>a.age-b.age)[0];
+  const marges={};ann.forEach(a=>{if(a.ecart==null||!a.gpu_modele)return;
+    (marges[a.gpu_modele]=marges[a.gpu_modele]||[]).push(a.ecart)});
+  const meilleurMarge=Object.entries(marges).map(([g,es])=>({g,m:mediane(es)}))
+    .sort((a,b)=>b.m-a.m)[0];
+  $("#configGagnante").innerHTML=`<h3>⚡ Config gagnante</h3>
+    <p class="sub">Croisement vitesse de rotation × marge du marché</p>
+    <div class="stats">
+    <div class="stat"><div class="lab">Se vend le plus vite</div>
+      <div class="val sm">${vitesse?vitesse.g+" ("+fmt1(vitesse.age)+" j en ligne en moy.)":"—"}</div></div>
+    <div class="stat"><div class="lab">Meilleure marge marché</div>
+      <div class="val sm">${meilleurMarge?meilleurMarge.g+" (+"+fmt(meilleurMarge.m)+" € médian)":"—"}</div></div>
+    </div>
+    <p class="note">Monte en priorité la config qui combine rotation courte et marge élevée.
+    Les chiffres se fiabilisent après quelques jours de collecte.</p>`;
+}
+
+/* ================================================================
+   ONGLET RÉSUMÉ
+================================================================ */
+function renderResume(){
+  const modeles=modelesDispo();
+  $("#resumeGrid").innerHTML=modeles.map(m=>{
+    const occ=OCC.filter(a=>a.modele===m&&a.alerte!=="masque");
+    const nf=NEUF.filter(a=>a.modele===m);
+    if(!occ.length&&!nf.length)return"";
+    const medO=mediane(occ.map(a=>a.prix_unitaire));
+    const minN=nf.length?Math.min(...nf.map(a=>a.prix_unitaire)):null;
+    const ecart=medO&&minN?Math.round((medO-minN)/minN*100):null;
+    const best=occ.filter(a=>a.alerte==="rouge"||a.alerte==="orange")
+      .sort((a,b)=>a.pct-b.pct)[0];
+    const rot=(D.rotation||{})[m];
+    return`<div class="rcard"><h4>${m}</h4>
+      <div class="rrow"><span>Médiane occasion</span><b>${fmtE(medO)}</b></div>
+      <div class="rrow"><span>Neuf le moins cher</span><b>${fmtE(minN)}</b></div>
+      <div class="rrow"><span>Occasion vs neuf</span><b>${ecart==null?"—":ecart+"%"}</b></div>
+      <div class="rrow"><span>Annonces visibles</span><b>${occ.length}</b></div>
+      <div class="rrow"><span>Rotation moyenne</span><b>${rot?fmt1(rot)+" h":"—"}</b></div>
+      <div class="rrow"><span>Meilleure affaire</span>
+        <b>${best?fmtE(best.prix_unitaire)+" ("+fmt1(best.pct)+"%)":"—"}</b></div>
+    </div>`}).join("");
+}
+
+/* ================================================================
+   ONGLET P&L (localStorage + export/import)
+================================================================ */
+function pnlLoad(){try{return JSON.parse(localStorage.getItem("vc_pnl")||"[]")}catch(e){return[]}}
+function pnlSave(l){try{localStorage.setItem("vc_pnl",JSON.stringify(l))}catch(e){}}
+function renderPnl(){
+  const l=pnlLoad();
+  const achats=l.filter(e=>e.type==="achat").reduce((s,e)=>s+e.montant,0);
+  const ventes=l.filter(e=>e.type==="vente").reduce((s,e)=>s+e.montant,0);
+  const frais=l.filter(e=>e.type==="frais").reduce((s,e)=>s+e.montant,0);
+  const marge=ventes-achats-frais;
+  $("#statsPnl").innerHTML=`
+    <div class="stat"><div class="lab">Investi</div><div class="val">${fmtE(achats)}</div></div>
+    <div class="stat"><div class="lab">Revendu</div><div class="val">${fmtE(ventes)}</div></div>
+    <div class="stat"><div class="lab">Frais</div><div class="val">${fmtE(frais)}</div></div>
+    <div class="stat"><div class="lab">Marge nette</div>
+      <div class="val" style="color:${marge>=0?"var(--vert)":"var(--rouge)"}">${(marge>=0?"+":"")+fmtE(marge)}</div></div>
+    <div class="stat"><div class="lab">ROI</div>
+      <div class="val">${achats?fmt1(marge/achats*100)+"%":"—"}</div></div>`;
+  $("#tblPnl").innerHTML=`<tr><th>Date</th><th>Description</th><th>Type</th><th>Montant</th><th></th></tr>`+
+    (l.length?[...l].reverse().map((e,ri)=>{const i=l.length-1-ri;
+      return`<tr><td>${e.date||"—"}</td><td>${e.desc}</td>
+      <td>${e.type==="achat"?"🛒 Achat":e.type==="vente"?"💰 Vente":"📎 Frais"}</td>
+      <td class="prix ${e.type==="vente"?"marge-pos":""}">${e.type==="vente"?"+":"-"}${fmtE(e.montant)}</td>
+      <td><button class="btn danger" style="padding:3px 9px;font-size:11px" onclick="pnlDel(${i})">✕</button></td></tr>`}).join("")
+    :`<tr><td colspan="5" class="empty">Aucune opération — ajoute ton premier achat ci-dessus</td></tr>`);
+}
+window.pnlDel=i=>{const l=pnlLoad();l.splice(i,1);pnlSave(l);renderPnl()};
+$("#pnlAdd").onclick=()=>{
+  const m=parseFloat($("#pnlMontant").value);
+  if(!$("#pnlDesc").value||isNaN(m))return alert("Description et montant requis");
+  const l=pnlLoad();
+  l.push({date:$("#pnlDate").value||new Date().toISOString().slice(0,10),
+    desc:$("#pnlDesc").value,type:$("#pnlType").value,montant:m});
+  pnlSave(l);$("#pnlDesc").value="";$("#pnlMontant").value="";renderPnl();
+};
+$("#pnlExport").onclick=()=>{
+  const blob=new Blob([JSON.stringify(pnlLoad(),null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="pnl_backup.json";a.click();
+};
+$("#pnlImportBtn").onclick=()=>$("#pnlImport").click();
+$("#pnlImport").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);
+    if(Array.isArray(d)){pnlSave(d);renderPnl()}else alert("Format invalide")}
+    catch(err){alert("JSON invalide")}};
+  r.readAsText(f);
+};
+
+/* ================================================================
+   RENDER GLOBAL + INIT
+================================================================ */
+function renderAll(){
+  const t=$("#tabs button.on").dataset.tab;
+  if(t==="tableaux")renderTableaux();
+  else if(t==="tendances")renderTendances();
+  else if(t==="deals")renderDeals();
+  else if(t==="marche")renderMarche();
+  else if(t==="pc")renderPc();
+  else if(t==="opportunites")renderOpportunites();
+  else if(t==="resume")renderResume();
+  else if(t==="pnl")renderPnl();
+}
+let theme="dark";
+try{theme=localStorage.getItem("vc_theme")||
+  (matchMedia("(prefers-color-scheme: light)").matches?"light":"dark")}catch(e){}
+setTheme(theme);
+window.addEventListener("resize",()=>renderAll());
+</script>
+</body>
+</html>
